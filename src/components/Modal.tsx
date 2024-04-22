@@ -1,8 +1,13 @@
 import '../app.scss'
 import { useState } from 'react';
+import '../features/Types'
 type SelectEntranceHandler = React.ChangeEventHandler<HTMLSelectElement>;
 type SelectAppartHandler = React.ChangeEventHandler<HTMLSelectElement>;
 
+interface Row {
+    entrances: string[];
+    apparts: string[];
+  }
 
 interface ModalProps {
     isOpen: boolean;
@@ -10,7 +15,7 @@ interface ModalProps {
     selectEntrance: SelectEntranceHandler;
     col1: string;
     col2: string;
-    addElement: { entrance: string[]; appart: string[] };
+    addElement: Row;
     entrArray: { value: string; label: string }[];
     appartArray: { value: string; label: string }[];
     addRow: () => void;
@@ -18,9 +23,10 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({isOpen, onClose, selectEntrance, col1, col2, entrArray, appartArray, addElement, addRow }) => {
     
-    const [selectedEntrances, setSelectedEntrances] = useState<string[]>(addElement.entrance || []);
-    const [selectedApparts, setSelectedApparts] = useState<string[]>(addElement.appart || []);
+    const [selectedEntrances, setSelectedEntrances] = useState<string[]>(addElement.entrances || []);
+    const [selectedApparts, setSelectedApparts] = useState<string[]>(addElement.apparts || []);
     const [firstSelect, setFirstSelect] = useState<boolean>(false);
+    const [newRow, setNewRow] = useState<Row>({entrances: [], apparts: []});
 
 
     const handleSelectChange: SelectEntranceHandler = (event) => {
@@ -37,6 +43,15 @@ export const Modal: React.FC<ModalProps> = ({isOpen, onClose, selectEntrance, co
         // Call selectedApparts(event) if it's a function that needs to handle selectedApparts
         console.log(selectedOptions);
     };
+
+    const handleRowAdd = () => {
+        const selectedData = [...selectedEntrances, ...selectedApparts];
+        addRow(selectedData);
+        setSelectedEntrances([]);
+        setSelectedApparts([]);
+        return selectedData;
+    }
+
     
     return (
         <>
@@ -107,14 +122,13 @@ export const Modal: React.FC<ModalProps> = ({isOpen, onClose, selectEntrance, co
                                 }
                             </select>
                             <div className='modal-btn'>
-                                <button className='submit' onClick={() => addRow}>Добавить</button>
+                                <button className='submit' onClick={handleRowAdd}>Добавить</button>
                             </div>
                         </div>
                     )}
-
                 </div>
             </div>
         )}
         </>
-    )
+    )   
 }
